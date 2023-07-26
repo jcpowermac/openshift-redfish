@@ -8,7 +8,7 @@ $bmchash = ConvertFrom-Json -InputObject $bmc -AsHashtable
 $slackMessage = @"
 BMC: {0}
 Node: {1}
-Severity {2}
+Severity: {2}
 Message: {3}
 "@
 
@@ -26,26 +26,23 @@ foreach ($key in $bmchash.Keys) {
         # array of json strings
         $listJsonStringLogs = get_system_log -ip $bmchash[$key].ip -username $username -password $password
 
-        
         foreach ($jsonString in $listJsonStringLogs) {
-            $logs = ConvertFrom-Json -Depth 10 -InputObject $jsonString -AsHashtable 
-            $logsLast24h = $logs | Where-Object {$_.Created -ge $last24h}
-
+            $logs = ConvertFrom-Json -Depth 10 -InputObject $jsonString -AsHashtable
+            $logsLast24h = $logs | Where-Object { $_.Created -ge $last24h }
 
             foreach ($l in $logsLast24h) {
                 try {
-                if($l.ContainsKey("Severity")) {
-                    if(-not $l.Severity.ToLower().Contains("ok")) {
-                        $l.Message
-                        $l.Severity
-                        Send-SlackMessage -Uri $Env:SLACK_WEBHOOK_URI -Text ($slackMessage -f $bmchash[$key].ip, $bmchash[$key].node, $l.Severity, $l.Message)
+                    if ($l.ContainsKey("Severity")) {
+                        if (-not $l.Severity.ToLower().Contains("ok")) {
+                            $l.Message
+                            $l.Severity
+                            Send-SlackMessage -Uri $Env:SLACK_WEBHOOK_URI -Text ($slackMessage -f $bmchash[$key].ip, $bmchash[$key].node, $l.Severity, $l.Message)
+                        }
                     }
                 }
-            }
-            catch {} # ignore
+                catch {} # ignore
             }
         }
-
     }
     catch {
         Get-Error

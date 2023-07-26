@@ -1,0 +1,53 @@
+kind: CronJob
+apiVersion: batch/v1
+metadata:
+  name: logs
+spec:
+  schedule: 0 */6 * * *
+  concurrencyPolicy: Forbid
+  suspend: false
+  jobTemplate:
+    spec:
+      backoffLimit: 2
+      template:
+        spec:
+          volumes:
+          - name: bmc-credentials
+            secret:
+              secretName: bmc-credentials
+              defaultMode: 420
+          - name: bmc-variables
+            configMap:
+              name: bmc-variables
+              defaultMode: 420
+          containers:
+            - resources: {}
+              terminationMessagePath: /dev/termination-log
+              name: redfish
+              env:
+                - name: SLACK_WEBHOOK_URI
+                  valueFrom:
+                    secretKeyRef:
+                      name: slack-webhook-uri
+                      key: uri
+              imagePullPolicy: Always
+              volumeMounts:
+              - name: bmc-credentials
+                readOnly: true
+                mountPath: /var/run/secret/bmc
+              - name: bmc-variables
+                readOnly: true
+                mountPath: /var/run/config/bmc
+              terminationMessagePolicy: File
+              image: 'quay.io/jcallen/openshift-redfish:latest'
+              args:
+                - /bin/pwsh
+                - '-File'
+                - /projects/run.ps1
+          restartPolicy: Never
+          terminationGracePeriodSeconds: 30
+          dnsPolicy: ClusterFirst
+          securityContext: {}
+          schedulerName: default-scheduler
+  successfulJobsHistoryLimit: 1
+  failedJobsHistoryLimit: 1
