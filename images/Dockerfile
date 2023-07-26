@@ -25,7 +25,7 @@ RUN export POWERSHELL_TELEMETRY_OPTOUT=1 && \
           \$ErrorActionPreference = 'Stop' ; \
           \$ProgressPreference = 'SilentlyContinue' ; \
           Set-PSRepository -Name PSGallery -InstallationPolicy Trusted ; \
-          Install-Module -Force -Scope AllUsers PSSlack
+          Install-Module -Force -Scope AllUsers PSSlack"
 
 RUN for f in "${HOME}" "/etc/hosts"; do \
       echo "Changing permissions on ${f}" && chgrp -R 0 ${f} && \
