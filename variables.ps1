@@ -1,13 +1,16 @@
 $bmc = @"
 {
     "m0": {
-        "secret": "/var/run/secret/vcenter/ibm.xml"
+        "ip": "10.48.77.165",
+        "secret": "/var/run/secret/bmc/m0.xml"
     },
     "m1": {
-        "secret": "/var/run/secret/vcenter/ibm8.xml"
+        "ip": "10.48.77.146",
+        "secret": "/var/run/secret/bmc/m1.xml"
     },
     "m2": {
-        "secret": "/var/run/secret/vcenter/devqe.xml"
+        "ip": "10.48.77.150",
+        "secret": "/var/run/secret/bmc/m2.xml"
     }
 }
 "@

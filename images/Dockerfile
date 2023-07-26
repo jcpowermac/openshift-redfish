@@ -12,6 +12,8 @@ RUN mkdir /projects ${HOME} && \
       chmod -R g+rwX ${f}; \
     done
 
+WORKDIR /projects
+
 ADD scripts/* ${PROJECTS}
 ADD entrypoint.sh /
 
@@ -32,5 +34,4 @@ RUN for f in "${HOME}" "/etc/hosts"; do \
       chmod -R g+rwX ${f}; \
     done
 
-WORKDIR /projects
 ENTRYPOINT ["/entrypoint.sh"]
