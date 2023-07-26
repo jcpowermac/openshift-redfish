@@ -40,19 +40,26 @@ foreach ($key in $bmchash.Keys) {
 
     try {
         # array of json strings
-        $listJsonStringLogs = get_system_logs -ip $bmchash[$key].ip -username $username -password $password
+        $listJsonStringLogs = get_system_log -ip $bmchash[$key].ip -username $username -password $password
 
+        
         foreach ($jsonString in $listJsonStringLogs) {
-            $logs = ConvertFrom-Json -InputObject $jsonString -AsHashtable
+            $logs = ConvertFrom-Json -Depth 10 -InputObject $jsonString -AsHashtable 
+            $logsLast24h = $logs | Where-Object {$_.Created -ge $last24h}
 
-            foreach ($l in $logs) {
-                $l.Created
 
+            foreach ($l in $logsLast24h) {
+                try {
+                if($l.ContainsKey("Severity")) {
+                    if(-not $l.Severity.ToLower().Contains("ok")) {
+                        $l.Message
+                        $l.Severity
+                    }
+                }
+            }
+            catch {} # ignore
             }
         }
-
-
-
 
         #Send-SlackMessage -Uri $Env:SLACK_WEBHOOK_URI -Text ($slackMessage -f $cihash[$key].vcenter)
     }
