@@ -1,9 +1,9 @@
 #!/bin/pwsh
+
 . /var/run/config/bmc/variables.ps1
 
 Import-Module /projects/powershell-redfish-lenovo/examples/get_system_log.psm1
 
-Set-PowerCLIConfiguration -InvalidCertificateAction:Ignore -Confirm:$false | Out-Null
 $bmchash = ConvertFrom-Json -InputObject $bmc -AsHashtable
 $slackMessage = @"
 BMC: {0}
